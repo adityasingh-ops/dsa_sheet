@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSA Problem Tracker - MAANG Prep</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .streak-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .streak-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .streak-dot.completed {
+            background: #48bb78;
+            box-shadow: 0 0 8px rgba(72, 187, 120, 0.5);
+        }
+
+        .streak-dot.current {
+            background: #ed8936;
+            animation: pulse 2s infinite;
+        }
+
+        .streak-dot.missed {
+            background: #f56565;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .filters-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        select, input {
+            padding: 8px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .weekend-bucket {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #f56565;
+        }
+
+        .weekend-bucket h3 {
+            color: #f56565;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .problems-container {
+            display: grid;
+            gap: 15px;
+        }
+
+        .week-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .week-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .week-header:hover {
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
+        }
+
+        .week-progress {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .day-container {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .day-header {
+            background: #f7fafc;
+            padding: 10px 20px;
+            font-weight: 600;
+            color: #2d3748;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .day-progress {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .problems-list {
+            padding: 15px 20px;
+        }
+
+        .problem-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .problem-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .problem-checkbox {
+            margin-right: 15px;
+            transform: scale(1.2);
+        }
+
+        .problem-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .problem-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .problem-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+
+        .difficulty-easy { color: #48bb78; font-weight: 600; }
+        .difficulty-medium { color: #ed8936; font-weight: 600; }
+        .difficulty-hard { color: #f56565; font-weight: 600; }
+
+        .problem-link {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .problem-link:hover {
+            text-decoration: underline;
+        }
+
+        .problem-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #f0f4f8;
+        }
+
+        .revision-btn.active {
+            color: #f56565;
+        }
+
+        .notes-btn.active {
+            color: #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .save-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #5a67d8;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .collapsible {
+            display: none;
+        }
+
+        .collapsible.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .filters-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-group {
+                justify-content: space-between;
+            }
+            
+            .problem-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .problem-actions {
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">
+                <h1><i class="fas fa-code"></i> DSA Problem Tracker</h1>
+                <p>Complete DSA Problem List: September 19 - December 31, 2025</p>
+                <p><strong>Your MAANG Journey Starts Here!</strong> 🚀</p>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalSolved">0</div>
+                    <div class="stat-label">Problems Solved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="currentStreak">0</div>
+                    <div class="stat-label">Current Streak</div>
+                    <div class="streak-container" id="streakDots"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="weekendBucket">0</div>
+                    <div class="stat-label">Weekend Bucket</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completionRate">0%</div>
+                    <div class="stat-label">Completion Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filters-container">
+            <div class="filter-group">
+                <label for="difficultyFilter">Difficulty:</label>
+                <select id="difficultyFilter">
+                    <option value="">All</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="statusFilter">Status:</label>
+                <select id="statusFilter">
+                    <option value="">All</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                    <option value="revision">Need Revision</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="weekFilter">Week:</label>
+                <select id="weekFilter">
+                    <option value="">All Weeks</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <input type="text" id="searchBox" class="search-box" placeholder="Search problems...">
+            </div>
+        </div>
+
+        <div class="weekend-bucket" id="weekendBucketSection">
+            <h3><i class="fas fa-calendar-week"></i> Weekend Bucket - Missed Problems</h3>
+            <div id="weekendProblems">
+                <p>No missed problems yet! Keep up the great work! 🎉</p>
+            </div>
+        </div>
+
+        <div class="problems-container" id="problemsContainer">
+            <!-- Problems will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Notes Modal -->
+    <div class="modal" id="notesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="notesTitle">Problem Notes</h3>
+                <button class="close-btn" onclick="closeNotesModal()">&times;</button>
+            </div>
+            <textarea id="notesText" placeholder="Add your notes, approach, time complexity, etc..."></textarea>
+            <button class="save-btn" onclick="saveNotes()">Save Notes</button>
+        </div>
+    </div>
+
+    <script>
+        // Problem data structure (parsed from the document)
+const problemData = {
+    "Week 1": {
+        title: "Arrays & Strings (Sep 19-25)",
+        days: {
+            "Day 1 (Sep 19)": {
+                topic: "Arrays Basics",
+                problems: [
+                    {id: "lc1", title: "Two Sum", difficulty: "Easy", leetcodeNum: 1},
+                    {id: "lc724", title: "Find Pivot Index", difficulty: "Easy", leetcodeNum: 724},
+                    {id: "lc1480", title: "Running Sum of 1d Array", difficulty: "Easy", leetcodeNum: 1480},
+                    {id: "lc1470", title: "Shuffle the Array", difficulty: "Easy", leetcodeNum: 1470}
+                ]
+            },
+            "Day 2 (Sep 20)": {
+                topic: "Array Operations",
+                problems: [
+                    {id: "lc121", title: "Best Time to Buy and Sell Stock", difficulty: "Easy", leetcodeNum: 121},
+                    {id: "lc53", title: "Maximum Subarray", difficulty: "Easy", leetcodeNum: 53},
+                    {id: "lc66", title: "Plus One", difficulty: "Easy", leetcodeNum: 66}
+                ]
+            },
+            "Day 3 (Sep 21)": {
+                topic: "Two Pointers Intro",
+                problems: [
+                    {id: "lc26", title: "Remove Duplicates from Sorted Array", difficulty: "Easy", leetcodeNum: 26},
+                    {id: "lc27", title: "Remove Element", difficulty: "Easy", leetcodeNum: 27},
+                    {id: "lc88", title: "Merge Sorted Array", difficulty: "Easy", leetcodeNum: 88},
+                    {id: "lc977", title: "Squares of a Sorted Array", difficulty: "Easy", leetcodeNum: 977}
+                ]
+            },
+            "Day 4 (Sep 22)": {
+                topic: "Two Pointers Practice",
+                problems: [
+                    {id: "lc125", title: "Valid Palindrome", difficulty: "Easy", leetcodeNum: 125},
+                    {id: "lc167", title: "Two Sum II - Input Array Is Sorted", difficulty: "Easy", leetcodeNum: 167},
+                    {id: "lc283", title: "Move Zeroes", difficulty: "Easy", leetcodeNum: 283}
+                ]
+            },
+            "Day 5 (Sep 23)": {
+                topic: "String Basics",
+                problems: [
+                    {id: "lc344", title: "Reverse String", difficulty: "Easy", leetcodeNum: 344},
+                    {id: "lc387", title: "First Unique Character in a String", difficulty: "Easy", leetcodeNum: 387},
+                    {id: "lc242", title: "Valid Anagram", difficulty: "Easy", leetcodeNum: 242},
+                    {id: "lc383", title: "Ransom Note", difficulty: "Easy", leetcodeNum: 383}
+                ]
+            },
+            "Day 6 (Sep 24)": {
+                topic: "String Operations",
+                problems: [
+                    {id: "lc14", title: "Longest Common Prefix", difficulty: "Easy", leetcodeNum: 14},
+                    {id: "lc58", title: "Length of Last Word", difficulty: "Easy", leetcodeNum: 58},
+                    {id: "lc28", title: "Implement strStr()", difficulty: "Easy", leetcodeNum: 28}
+                ]
+            },
+            "Day 7 (Sep 25)": {
+                topic: "Week 1 Mixed",
+                problems: [
+                    {id: "lc557", title: "Reverse Words in a String III", difficulty: "Easy", leetcodeNum: 557},
+                    {id: "lc217", title: "Contains Duplicate", difficulty: "Easy", leetcodeNum: 217},
+                    {id: "lc136", title: "Single Number", difficulty: "Easy", leetcodeNum: 136},
+                    {id: "lc268", title: "Missing Number", difficulty: "Easy", leetcodeNum: 268}
+                ]
+            }
+        }
+    },
+    "Week 2": {
+        title: "Linked Lists & Basic Data Structures (Sep 26 - Oct 2)",
+        days: {
+            "Day 8 (Sep 26)": {
+                topic: "Linked List Basics",
+                problems: [
+                    {id: "lc206", title: "Reverse Linked List", difficulty: "Easy", leetcodeNum: 206},
+                    {id: "lc876", title: "Middle of the Linked List", difficulty: "Easy", leetcodeNum: 876},
+                    {id: "lc237", title: "Delete Node in a Linked List", difficulty: "Easy", leetcodeNum: 237}
+                ]
+            },
+            "Day 9 (Sep 27)": {
+                topic: "Linked List Operations",
+                problems: [
+                    {id: "lc21", title: "Merge Two Sorted Lists", difficulty: "Easy", leetcodeNum: 21},
+                    {id: "lc141", title: "Linked List Cycle", difficulty: "Easy", leetcodeNum: 141},
+                    {id: "lc203", title: "Remove Linked List Elements", difficulty: "Easy", leetcodeNum: 203},
+                    {id: "lc83", title: "Remove Duplicates from Sorted List", difficulty: "Easy", leetcodeNum: 83}
+                ]
+            },
+            "Day 10 (Sep 28)": {
+                topic: "Linked List Advanced",
+                problems: [
+                    {id: "lc234", title: "Palindrome Linked List", difficulty: "Easy", leetcodeNum: 234},
+                    {id: "lc160", title: "Intersection of Two Linked Lists", difficulty: "Easy", leetcodeNum: 160},
+                    {id: "lc2", title: "Add Two Numbers", difficulty: "Medium", leetcodeNum: 2}
+                ]
+            },
+            "Day 11 (Sep 29)": {
+                topic: "Stack Basics",
+                problems: [
+                    {id: "lc20", title: "Valid Parentheses", difficulty: "Easy", leetcodeNum: 20},
+                    {id: "lc225", title: "Implement Stack using Queues", difficulty: "Easy", leetcodeNum: 225},
+                    {id: "lc682", title: "Baseball Game", difficulty: "Easy", leetcodeNum: 682},
+                    {id: "lc496", title: "Next Greater Element I", difficulty: "Easy", leetcodeNum: 496}
+                ]
+            },
+            "Day 12 (Sep 30)": {
+                topic: "Stack Applications",
+                problems: [
+                    {id: "lc155", title: "Min Stack", difficulty: "Easy", leetcodeNum: 155},
+                    {id: "lc844", title: "Backspace String Compare", difficulty: "Easy", leetcodeNum: 844},
+                    {id: "lc739", title: "Daily Temperatures", difficulty: "Medium", leetcodeNum: 739}
+                ]
+            },
+            "Day 13 (Oct 1)": {
+                topic: "Queue Basics",
+                problems: [
+                    {id: "lc232", title: "Implement Queue using Stacks", difficulty: "Easy", leetcodeNum: 232},
+                    {id: "lc622", title: "Design Circular Queue", difficulty: "Medium", leetcodeNum: 622},
+                    {id: "lc933", title: "Number of Recent Calls", difficulty: "Easy", leetcodeNum: 933}
+                ]
+            },
+            "Day 14 (Oct 2)": {
+                topic: "Week 2 Review",
+                problems: [
+                    {id: "lc19", title: "Remove Nth Node From End of List", difficulty: "Medium", leetcodeNum: 19},
+                    {id: "lc1603", title: "Design Parking System", difficulty: "Easy", leetcodeNum: 1603},
+                    {id: "lc1614", title: "Maximum Nesting Depth of Parentheses", difficulty: "Easy", leetcodeNum: 1614}
+                ]
+            }
+        }
+    },
+    "Week 3": {
+        title: "Trees Introduction (Oct 3-9)",
+        days: {
+            "Day 15 (Oct 3)": {
+                topic: "Binary Tree Basics",
+                problems: [
+                    {id: "lc104", title: "Maximum Depth of Binary Tree", difficulty: "Easy", leetcodeNum: 104},
+                    {id: "lc226", title: "Invert Binary Tree", difficulty: "Easy", leetcodeNum: 226},
+                    {id: "lc100", title: "Same Tree", difficulty: "Easy", leetcodeNum: 100}
+                ]
+            },
+            "Day 16 (Oct 4)": {
+                topic: "Tree Traversals",
+                problems: [
+                    {id: "lc94", title: "Binary Tree Inorder Traversal", difficulty: "Easy", leetcodeNum: 94},
+                    {id: "lc144", title: "Binary Tree Preorder Traversal", difficulty: "Easy", leetcodeNum: 144},
+                    {id: "lc145", title: "Binary Tree Postorder Traversal", difficulty: "Easy", leetcodeNum: 145},
+                    {id: "lc112", title: "Path Sum", difficulty: "Easy", leetcodeNum: 112}
+                ]
+            },
+            "Day 17 (Oct 5)": {
+                topic: "Tree Properties",
+                problems: [
+                    {id: "lc101", title: "Symmetric Tree", difficulty: "Easy", leetcodeNum: 101},
+                    {id: "lc543", title: "Diameter of Binary Tree", difficulty: "Easy", leetcodeNum: 543},
+                    {id: "lc110", title: "Balanced Binary Tree", difficulty: "Easy", leetcodeNum: 110}
+                ]
+            },
+            "Day 18 (Oct 6)": {
+                topic: "Tree Algorithms",
+                problems: [
+                    {id: "lc617", title: "Merge Two Binary Trees", difficulty: "Easy", leetcodeNum: 617},
+                    {id: "lc102", title: "Binary Tree Level Order Traversal", difficulty: "Medium", leetcodeNum: 102},
+                    {id: "lc111", title: "Minimum Depth of Binary Tree", difficulty: "Easy", leetcodeNum: 111},
+                    {id: "lc404", title: "Sum of Left Leaves", difficulty: "Easy", leetcodeNum: 404}
+                ]
+            },
+            "Day 19 (Oct 7)": {
+                topic: "BST Basics",
+                problems: [
+                    {id: "lc700", title: "Search in a Binary Search Tree", difficulty: "Easy", leetcodeNum: 700},
+                    {id: "lc701", title: "Insert into a Binary Search Tree", difficulty: "Medium", leetcodeNum: 701},
+                    {id: "lc938", title: "Range Sum of BST", difficulty: "Easy", leetcodeNum: 938}
+                ]
+            },
+            "Day 20 (Oct 8)": {
+                topic: "BST Operations",
+                problems: [
+                    {id: "lc98", title: "Validate Binary Search Tree", difficulty: "Medium", leetcodeNum: 98},
+                    {id: "lc653", title: "Two Sum IV - Input is a BST", difficulty: "Easy", leetcodeNum: 653},
+                    {id: "lc235", title: "Lowest Common Ancestor of a Binary Search Tree", difficulty: "Easy", leetcodeNum: 235}
+                ]
+            },
+            "Day 21 (Oct 9)": {
+                topic: "Week 3 Practice",
+                problems: [
+                    {id: "lc108", title: "Convert Sorted Array to Binary Search Tree", difficulty: "Easy", leetcodeNum: 108},
+                    {id: "lc257", title: "Binary Tree Paths", difficulty: "Easy", leetcodeNum: 257},
+                    {id: "lc501", title: "Find Mode in Binary Search Tree", difficulty: "Easy", leetcodeNum: 501}
+                ]
+            }
+        }
+    },
+    "Week 4": {
+        title: "Sorting & Searching (Oct 10-16)",
+        days: {
+            "Day 22 (Oct 10)": {
+                topic: "Sorting Basics",
+                problems: [
+                    {id: "lc75", title: "Sort Colors", difficulty: "Medium", leetcodeNum: 75},
+                    {id: "lc905", title: "Sort Array By Parity", difficulty: "Easy", leetcodeNum: 905},
+                    {id: "lc922", title: "Sort Array By Parity II", difficulty: "Easy", leetcodeNum: 922}
+                ]
+            },
+            "Day 23 (Oct 11)": {
+                topic: "Sorting Applications",
+                problems: [
+                    {id: "lc252", title: "Meeting Rooms", difficulty: "Easy", leetcodeNum: 252},
+                    {id: "lc179", title: "Largest Number", difficulty: "Medium", leetcodeNum: 179},
+                    {id: "lc1122", title: "Relative Sort Array", difficulty: "Easy", leetcodeNum: 1122},
+                    {id: "lc1051", title: "Height Checker", difficulty: "Easy", leetcodeNum: 1051}
+                ]
+            },
+            "Day 24 (Oct 12)": {
+                topic: "Binary Search Basics",
+                problems: [
+                    {id: "lc704", title: "Binary Search", difficulty: "Easy", leetcodeNum: 704},
+                    {id: "lc35", title: "Search Insert Position", difficulty: "Easy", leetcodeNum: 35},
+                    {id: "lc278", title: "First Bad Version", difficulty: "Easy", leetcodeNum: 278}
+                ]
+            },
+            "Day 25 (Oct 13)": {
+                topic: "Binary Search Applications",
+                problems: [
+                    {id: "lc34", title: "Find First and Last Position of Element", difficulty: "Medium", leetcodeNum: 34},
+                    {id: "lc852", title: "Peak Index in a Mountain Array", difficulty: "Easy", leetcodeNum: 852},
+                    {id: "lc367", title: "Valid Perfect Square", difficulty: "Easy", leetcodeNum: 367},
+                    {id: "lc69", title: "Sqrt(x)", difficulty: "Easy", leetcodeNum: 69}
+                ]
+            },
+            "Day 26 (Oct 14)": {
+                topic: "Advanced Binary Search",
+                problems: [
+                    {id: "lc33", title: "Search in Rotated Sorted Array", difficulty: "Medium", leetcodeNum: 33},
+                    {id: "lc153", title: "Find Minimum in Rotated Sorted Array", difficulty: "Medium", leetcodeNum: 153},
+                    {id: "lc74", title: "Search a 2D Matrix", difficulty: "Medium", leetcodeNum: 74}
+                ]
+            },
+            "Day 27 (Oct 15)": {
+                topic: "Binary Search Practice",
+                problems: [
+                    {id: "lc374", title: "Guess Number Higher or Lower", difficulty: "Easy", leetcodeNum: 374},
+                    {id: "lc441", title: "Arranging Coins", difficulty: "Easy", leetcodeNum: 441},
+                    {id: "lc162", title: "Find Peak Element", difficulty: "Medium", leetcodeNum: 162}
+                ]
+            },
+            "Day 28 (Oct 16)": {
+                topic: "Week 4 Review",
+                problems: [
+                    {id: "lc875", title: "Koko Eating Bananas", difficulty: "Medium", leetcodeNum: 875},
+                    {id: "lc1011", title: "Capacity To Ship Packages Within D Days", difficulty: "Medium", leetcodeNum: 1011},
+                    {id: "lc981", title: "Time Based Key-Value Store", difficulty: "Medium", leetcodeNum: 981}
+                ]
+            }
+        }
+    },
+    "Week 5": {
+        title: "Hash Maps & Two Pointers Advanced (Oct 17-23)",
+        days: {
+            "Day 29 (Oct 17)": {
+                topic: "HashMap Basics",
+                problems: [
+                    {id: "lc1_v2", title: "Two Sum", difficulty: "Easy", leetcodeNum: 1},
+                    {id: "lc49", title: "Group Anagrams", difficulty: "Medium", leetcodeNum: 49},
+                    {id: "lc219", title: "Contains Duplicate II", difficulty: "Easy", leetcodeNum: 219}
+                ]
+            },
+            "Day 30 (Oct 18)": {
+                topic: "HashMap Applications",
+                problems: [
+                    {id: "lc350", title: "Intersection of Two Arrays II", difficulty: "Easy", leetcodeNum: 350},
+                    {id: "lc202", title: "Happy Number", difficulty: "Easy", leetcodeNum: 202},
+                    {id: "lc560", title: "Subarray Sum Equals K", difficulty: "Medium", leetcodeNum: 560},
+                    {id: "lc454", title: "4Sum II", difficulty: "Medium", leetcodeNum: 454}
+                ]
+            },
+            "Day 31 (Oct 19)": {
+                topic: "Two Pointers Advanced",
+                problems: [
+                    {id: "lc15", title: "3Sum", difficulty: "Medium", leetcodeNum: 15},
+                    {id: "lc16", title: "3Sum Closest", difficulty: "Medium", leetcodeNum: 16},
+                    {id: "lc11", title: "Container With Most Water", difficulty: "Medium", leetcodeNum: 11}
+                ]
+            },
+            "Day 32 (Oct 20)": {
+                topic: "Two Pointers + Arrays",
+                problems: [
+                    {id: "lc18", title: "4Sum", difficulty: "Medium", leetcodeNum: 18},
+                    {id: "lc42", title: "Trapping Rain Water", difficulty: "Hard", leetcodeNum: 42},
+                    {id: "lc75_v2", title: "Sort Colors", difficulty: "Medium", leetcodeNum: 75}
+                ]
+            },
+            "Day 33 (Oct 21)": {
+                topic: "Pattern Practice",
+                problems: [
+                    {id: "lc5", title: "Longest Palindromic Substring", difficulty: "Medium", leetcodeNum: 5},
+                    {id: "lc647", title: "Palindromic Substrings", difficulty: "Medium", leetcodeNum: 647},
+                    {id: "lc680", title: "Valid Palindrome II", difficulty: "Easy", leetcodeNum: 680},
+                    {id: "lc409", title: "Longest Palindrome", difficulty: "Easy", leetcodeNum: 409}
+                ]
+            },
+            "Day 34 (Oct 22)": {
+                topic: "Mixed Practice",
+                problems: [
+                    {id: "lc238", title: "Product of Array Except Self", difficulty: "Medium", leetcodeNum: 238},
+                    {id: "lc347", title: "Top K Frequent Elements", difficulty: "Medium", leetcodeNum: 347},
+                    {id: "lc448", title: "Find All Numbers Disappeared in Array", difficulty: "Easy", leetcodeNum: 448}
+                ]
+            },
+            "Day 35 (Oct 23)": {
+                topic: "Week 5 Review",
+                problems: [
+                    {id: "lc128", title: "Longest Consecutive Sequence", difficulty: "Medium", leetcodeNum: 128},
+                    {id: "lc380", title: "Insert Delete GetRandom O(1)", difficulty: "Medium", leetcodeNum: 380},
+                    {id: "lc41", title: "First Missing Positive", difficulty: "Hard", leetcodeNum: 41}
+                ]
+            }
+        }
+    },
+    "Week 6": {
+        title: "Sliding Window & Foundation Complete (Oct 24-31)",
+        days: {
+            "Day 36 (Oct 24)": {
+                topic: "Sliding Window Basics",
+                problems: [
+                    {id: "lc643", title: "Maximum Average Subarray I", difficulty: "Easy", leetcodeNum: 643},
+                    {id: "lc220", title: "Contains Duplicate III", difficulty: "Medium", leetcodeNum: 220},
+                    {id: "lc209", title: "Minimum Size Subarray Sum", difficulty: "Medium", leetcodeNum: 209}
+                ]
+            },
+            "Day 37 (Oct 25)": {
+                topic: "Variable Window",
+                problems: [
+                    {id: "lc3", title: "Longest Substring Without Repeating Characters", difficulty: "Medium", leetcodeNum: 3},
+                    {id: "lc424", title: "Longest Repeating Character Replacement", difficulty: "Medium", leetcodeNum: 424},
+                    {id: "lc567", title: "Permutation in String", difficulty: "Medium", leetcodeNum: 567}
+                ]
+            },
+            "Day 38 (Oct 26)": {
+                topic: "Window + HashMap",
+                problems: [
+                    {id: "lc438", title: "Find All Anagrams in a String", difficulty: "Medium", leetcodeNum: 438},
+                    {id: "lc76", title: "Minimum Window Substring", difficulty: "Hard", leetcodeNum: 76},
+                    {id: "lc30", title: "Substring with Concatenation of All Words", difficulty: "Hard", leetcodeNum: 30}
+                ]
+            },
+            "Day 39 (Oct 27)": {
+                topic: "Advanced Window",
+                problems: [
+                    {id: "lc1004", title: "Max Consecutive Ones III", difficulty: "Medium", leetcodeNum: 1004},
+                    {id: "lc904", title: "Fruit Into Baskets", difficulty: "Medium", leetcodeNum: 904},
+                    {id: "lc340", title: "Longest Substring with At Most K Distinct Characters", difficulty: "Medium", leetcodeNum: 340},
+                    {id: "lc992", title: "Subarrays with K Different Integers", difficulty: "Hard", leetcodeNum: 992}
+                ]
+            },
+            "Day 40 (Oct 28)": {
+                topic: "Window Practice",
+                problems: [
+                    {id: "lc1456", title: "Maximum Number of Vowels in Substring", difficulty: "Medium", leetcodeNum: 1456},
+                    {id: "lc1208", title: "Get Equal Substrings Within Budget", difficulty: "Medium", leetcodeNum: 1208},
+                    {id: "lc239", title: "Sliding Window Maximum", difficulty: "Hard", leetcodeNum: 239}
+                ]
+            },
+            "Day 41 (Oct 29)": {
+                topic: "Mixed Algorithms",
+                problems: [
+                    {id: "lc713", title: "Subarray Product Less Than K", difficulty: "Medium", leetcodeNum: 713},
+                    {id: "lc930", title: "Binary Subarrays With Sum", difficulty: "Medium", leetcodeNum: 930},
+                    {id: "lc795", title: "Number of Subarrays with Bounded Maximum", difficulty: "Medium", leetcodeNum: 795}
+                ]
+            },
+            "Day 42 (Oct 30)": {
+                topic: "Foundation Review",
+                problems: [
+                    {id: "lc845", title: "Longest Mountain in Array", difficulty: "Medium", leetcodeNum: 845},
+                    {id: "lc442", title: "Find All Duplicates in an Array", difficulty: "Medium", leetcodeNum: 442},
+                    {id: "lc73", title: "Set Matrix Zeroes", difficulty: "Medium", leetcodeNum: 73},
+                    {id: "lc54", title: "Spiral Matrix", difficulty: "Medium", leetcodeNum: 54}
+                ]
+            },
+            "Day 43 (Oct 31)": {
+                topic: "October Final",
+                problems: [
+                    {id: "lc48", title: "Rotate Image", difficulty: "Medium", leetcodeNum: 48},
+                    {id: "lc55", title: "Jump Game", difficulty: "Medium", leetcodeNum: 55}
+                ]
+            }
+        }
+    },
+    "Week 7": {
+        title: "Dynamic Programming Foundation (Nov 1-7)",
+        days: {
+            "Day 44 (Nov 1)": {
+                topic: "DP Basics",
+                problems: [
+                    {id: "lc70", title: "Climbing Stairs", difficulty: "Easy", leetcodeNum: 70},
+                    {id: "lc509", title: "Fibonacci Number", difficulty: "Easy", leetcodeNum: 509},
+                    {id: "lc1137", title: "N-th Tribonacci Number", difficulty: "Easy", leetcodeNum: 1137}
+                ]
+            },
+            "Day 45 (Nov 2)": {
+                topic: "1D DP",
+                problems: [
+                    {id: "lc198", title: "House Robber", difficulty: "Medium", leetcodeNum: 198},
+                    {id: "lc746", title: "Min Cost Climbing Stairs", difficulty: "Easy", leetcodeNum: 746},
+                    {id: "lc740", title: "Delete and Earn", difficulty: "Medium", leetcodeNum: 740}
+                ]
+            },
+            "Day 46 (Nov 3)": {
+                topic: "DP Arrays",
+                problems: [
+                    {id: "lc53_v2", title: "Maximum Subarray", difficulty: "Easy", leetcodeNum: 53},
+                    {id: "lc213", title: "House Robber II", difficulty: "Medium", leetcodeNum: 213},
+                    {id: "lc256", title: "Paint House", difficulty: "Medium", leetcodeNum: 256},
+                    {id: "lc309", title: "Best Time to Buy and Sell Stock with Cooldown", difficulty: "Medium", leetcodeNum: 309}
+                ]
+            },
+            "Day 47 (Nov 4)": {
+                topic: "String DP",
+                problems: [
+                    {id: "lc647_v2", title: "Palindromic Substrings", difficulty: "Medium", leetcodeNum: 647},
+                    {id: "lc5_v2", title: "Longest Palindromic Substring", difficulty: "Medium", leetcodeNum: 5},
+                    {id: "lc139", title: "Word Break", difficulty: "Medium", leetcodeNum: 139}
+                ]
+            },
+            "Day 48 (Nov 5)": {
+                topic: "Advanced 1D DP",
+                problems: [
+                    {id: "lc91", title: "Decode Ways", difficulty: "Medium", leetcodeNum: 91},
+                    {id: "lc279", title: "Perfect Squares", difficulty: "Medium", leetcodeNum: 279},
+                    {id: "lc322", title: "Coin Change", difficulty: "Medium", leetcodeNum: 322},
+                    {id: "lc377", title: "Combination Sum IV", difficulty: "Medium", leetcodeNum: 377}
+                ]
+            },
+            "Day 49 (Nov 6)": {
+                topic: "DP Practice",
+                problems: [
+                    {id: "lc343", title: "Integer Break", difficulty: "Medium", leetcodeNum: 343},
+                    {id: "lc338", title: "Counting Bits", difficulty: "Medium", leetcodeNum: 338},
+                    {id: "lc264", title: "Ugly Number II", difficulty: "Medium", leetcodeNum: 264}
+                ]
+            },
+            "Day 50 (Nov 7)": {
+                topic: "Week 7 Review",
+                problems: [
+                    {id: "lc300", title: "Longest Increasing Subsequence", difficulty: "Medium", leetcodeNum: 300},
+                    {id: "lc354", title: "Russian Doll Envelopes", difficulty: "Hard", leetcodeNum: 354},
+                    {id: "lc646", title: "Maximum Length of Pair Chain", difficulty: "Medium", leetcodeNum: 646}
+                ]
+            }
+        }
+    },
+    "Week 8": {
+        title: "2D Dynamic Programming (Nov 8-14)",
+        days: {
+            "Day 51 (Nov 8)": {
+                topic: "Grid DP",
+                problems: [
+                    {id: "lc62", title: "Unique Paths", difficulty: "Medium", leetcodeNum: 62},
+                    {id: "lc63", title: "Unique Paths II", difficulty: "Medium", leetcodeNum: 63},
+                    {id: "lc64", title: "Minimum Path Sum", difficulty: "Medium", leetcodeNum: 64}
+                ]
+            },
+            "Day 52 (Nov 9)": {
+                topic: "Grid Applications",
+                problems: [
+                    {id: "lc221", title: "Maximum Square", difficulty: "Medium", leetcodeNum: 221},
+                    {id: "lc85", title: "Maximal Rectangle", difficulty: "Hard", leetcodeNum: 85},
+                    {id: "lc174", title: "Dungeon Game", difficulty: "Hard", leetcodeNum: 174}
+                ]
+            },
+            "Day 53 (Nov 10)": {
+                topic: "Subsequence DP",
+                problems: [
+                    {id: "lc1143", title: "Longest Common Subsequence", difficulty: "Medium", leetcodeNum: 1143},
+                    {id: "lc583", title: "Delete Operation for Two Strings", difficulty: "Medium", leetcodeNum: 583},
+                    {id: "lc72", title: "Edit Distance", difficulty: "Hard", leetcodeNum: 72},
+                    {id: "lc115", title: "Distinct Subsequences", difficulty: "Hard", leetcodeNum: 115}
+                ]
+            },
+            "Day 54 (Nov 11)": {
+                topic: "String Matching DP",
+                problems: [
+                    {id: "lc10", title: "Regular Expression Matching", difficulty: "Hard", leetcodeNum: 10},
+                    {id: "lc44", title: "Wildcard Matching", difficulty: "Hard", leetcodeNum: 44},
+                    {id: "lc97", title: "Interleaving String", difficulty: "Medium", leetcodeNum: 97}
+                ]
+            },
+            "Day 55 (Nov 12)": {
+                topic: "Knapsack Problems",
+                problems: [
+                    {id: "lc416", title: "Partition Equal Subset Sum", difficulty: "Medium", leetcodeNum: 416},
+                    {id: "lc494", title: "Target Sum", difficulty: "Medium", leetcodeNum: 494},
+                    {id: "lc474", title: "Ones and Zeroes", difficulty: "Medium", leetcodeNum: 474},
+                    {id: "lc1049", title: "Last Stone Weight II", difficulty: "Medium", leetcodeNum: 1049}
+                ]
+            },
+            "Day 56 (Nov 13)": {
+                topic: "Advanced 2D DP",
+                problems: [
+                    {id: "lc123", title: "Best Time to Buy and Sell Stock III", difficulty: "Hard", leetcodeNum: 123},
+                    {id: "lc188", title: "Best Time to Buy and Sell Stock IV", difficulty: "Hard", leetcodeNum: 188},
+                    {id: "lc312", title: "Burst Balloons", difficulty: "Hard", leetcodeNum: 312}
+                ]
+            },
+            "Day 57 (Nov 14)": {
+                topic: "Week 8 Review",
+                problems: [
+                    {id: "lc877", title: "Stone Game", difficulty: "Medium", leetcodeNum: 877},
+                    {id: "lc486", title: "Predict the Winner", difficulty: "Medium", leetcodeNum: 486},
+                    {id: "lc132", title: "Palindrome Partitioning II", difficulty: "Hard", leetcodeNum: 132}
+                ]
+            }
+        }
+    },
+    "Week 9": {
+        title: "Graphs - DFS/BFS (Nov 15-21)",
+        days: {
+            "Day 58 (Nov 15)": {
+                topic: "Graph Basics",
+                problems: [
+                    {id: "lc200", title: "Number of Islands", difficulty: "Medium", leetcodeNum: 200},
+                    {id: "lc695", title: "Max Area of Island", difficulty: "Medium", leetcodeNum: 695},
+                    {id: "lc463", title: "Island Perimeter", difficulty: "Easy", leetcodeNum: 463}
+                ]
+            },
+            "Day 59 (Nov 16)": {
+                topic: "DFS Applications",
+                problems: [
+                    {id: "lc133", title: "Clone Graph", difficulty: "Medium", leetcodeNum: 133},
+                    {id: "lc437", title: "Path Sum III", difficulty: "Medium", leetcodeNum: 437},
+                    {id: "lc543_v2", title: "Diameter of Binary Tree", difficulty: "Easy", leetcodeNum: 543}
+                ]
+            },
+            "Day 60 (Nov 17)": {
+                topic: "BFS Applications",
+                problems: [
+                    {id: "lc102_v2", title: "Binary Tree Level Order Traversal", difficulty: "Medium", leetcodeNum: 102},
+                    {id: "lc199", title: "Binary Tree Right Side View", difficulty: "Medium", leetcodeNum: 199},
+                    {id: "lc637", title: "Average of Levels in Binary Tree", difficulty: "Easy", leetcodeNum: 637},
+                    {id: "lc103", title: "Binary Tree Zigzag Level Order Traversal", difficulty: "Medium", leetcodeNum: 103}
+                ]
+            },
+            "Day 61 (Nov 18)": {
+                topic: "Graph Traversal",
+                problems: [
+                    {id: "lc733", title: "Flood Fill", difficulty: "Easy", leetcodeNum: 733},
+                    {id: "lc542", title: "01 Matrix", difficulty: "Medium", leetcodeNum: 542},
+                    {id: "lc1162", title: "As Far from Land as Possible", difficulty: "Medium", leetcodeNum: 1162}
+                ]
+            },
+            "Day 62 (Nov 19)": {
+                topic: "Advanced Graph",
+                problems: [
+                    {id: "lc130", title: "Surrounded Regions", difficulty: "Medium", leetcodeNum: 130},
+                    {id: "lc417", title: "Pacific Atlantic Water Flow", difficulty: "Medium", leetcodeNum: 417},
+                    {id: "lc1254", title: "Number of Closed Islands", difficulty: "Medium", leetcodeNum: 1254},
+                    {id: "lc127", title: "Word Ladder", difficulty: "Hard", leetcodeNum: 127}
+                ]
+            },
+            "Day 63 (Nov 20)": {
+                topic: "Topological Sort",
+                problems: [
+                    {id: "lc207", title: "Course Schedule", difficulty: "Medium", leetcodeNum: 207},
+                    {id: "lc210", title: "Course Schedule II", difficulty: "Medium", leetcodeNum: 210},
+                    {id: "lc269", title: "Alien Dictionary", difficulty: "Hard", leetcodeNum: 269}
+                ]
+            },
+            "Day 64 (Nov 21)": {
+                topic: "Week 9 Review",
+                problems: [
+                    {id: "lc310", title: "Minimum Height Trees", difficulty: "Medium", leetcodeNum: 310},
+                    {id: "lc261", title: "Graph Valid Tree", difficulty: "Medium", leetcodeNum: 261},
+                    {id: "lc323", title: "Number of Connected Components", difficulty: "Medium", leetcodeNum: 323},
+                    {id: "lc994", title: "Rotting Oranges", difficulty: "Medium", leetcodeNum: 994}
+                ]
+            }
+        }
+    },
+    "Week 10": {
+        title: "Heaps & Advanced Trees (Nov 22-28)",
+        days: {
+            "Day 65 (Nov 22)": {
+                topic: "Heap Basics",
+                problems: [
+                    {id: "lc215", title: "Kth Largest Element in an Array", difficulty: "Medium", leetcodeNum: 215},
+                    {id: "lc1046", title: "Last Stone Weight", difficulty: "Easy", leetcodeNum: 1046},
+                    {id: "lc973", title: "K Closest Points to Origin", difficulty: "Medium", leetcodeNum: 973}
+                ]
+            },
+            "Day 66 (Nov 23)": {
+                topic: "Top K Problems",
+                problems: [
+                    {id: "lc347_v2", title: "Top K Frequent Elements", difficulty: "Medium", leetcodeNum: 347},
+                    {id: "lc373", title: "Find K Pairs with Smallest Sums", difficulty: "Medium", leetcodeNum: 373},
+                    {id: "lc378", title: "Kth Smallest Element in a Sorted Matrix", difficulty: "Medium", leetcodeNum: 378},
+                    {id: "lc703", title: "Kth Largest Element in a Stream", difficulty: "Easy", leetcodeNum: 703}
+                ]
+            },
+            "Day 67 (Nov 24)": {
+                topic: "Advanced Heaps",
+                problems: [
+                    {id: "lc23", title: "Merge k Sorted Lists", difficulty: "Hard", leetcodeNum: 23},
+                    {id: "lc295", title: "Find Median from Data Stream", difficulty: "Hard", leetcodeNum: 295},
+                    {id: "lc480", title: "Sliding Window Median", difficulty: "Hard", leetcodeNum: 480}
+                ]
+            },
+            "Day 68 (Nov 25)": {
+                topic: "Tree Advanced",
+                problems: [
+                    {id: "lc297", title: "Serialize and Deserialize Binary Tree", difficulty: "Hard", leetcodeNum: 297},
+                    {id: "lc124", title: "Binary Tree Maximum Path Sum", difficulty: "Hard", leetcodeNum: 124},
+                    {id: "lc236", title: "Lowest Common Ancestor of a Binary Tree", difficulty: "Medium", leetcodeNum: 236}
+                ]
+            },
+            "Day 69 (Nov 26)": {
+                topic: "Trie",
+                problems: [
+                    {id: "lc208", title: "Implement Trie (Prefix Tree)", difficulty: "Medium", leetcodeNum: 208},
+                    {id: "lc211", title: "Design Add and Search Words Data Structure", difficulty: "Medium", leetcodeNum: 211},
+                    {id: "lc212", title: "Word Search II", difficulty: "Hard", leetcodeNum: 212},
+                    {id: "lc648", title: "Replace Words", difficulty: "Medium", leetcodeNum: 648}
+                ]
+            },
+            "Day 70 (Nov 27)": {
+                topic: "Advanced Tree Algorithms",
+                problems: [
+                    {id: "lc105", title: "Construct Binary Tree from Preorder and Inorder", difficulty: "Medium", leetcodeNum: 105},
+                    {id: "lc106", title: "Construct Binary Tree from Inorder and Postorder", difficulty: "Medium", leetcodeNum: 106},
+                    {id: "lc114", title: "Flatten Binary Tree to Linked List", difficulty: "Medium", leetcodeNum: 114}
+                ]
+            },
+            "Day 71 (Nov 28)": {
+                topic: "Week 10 Review",
+                problems: [
+                    {id: "lc99", title: "Recover Binary Search Tree", difficulty: "Medium", leetcodeNum: 99},
+                    {id: "lc116", title: "Populating Next Right Pointers", difficulty: "Medium", leetcodeNum: 116},
+                    {id: "lc129", title: "Sum Root to Leaf Numbers", difficulty: "Medium", leetcodeNum: 129}
+                ]
+            }
+        }
+    },
+    "Week 11": {
+        title: "Backtracking (Dec 1-7)",
+        days: {
+            "Day 72 (Dec 1)": {
+                topic: "Backtracking Basics",
+                problems: [
+                    {id: "lc22", title: "Generate Parentheses", difficulty: "Medium", leetcodeNum: 22},
+                    {id: "lc17", title: "Letter Combinations of a Phone Number", difficulty: "Medium", leetcodeNum: 17},
+                    {id: "lc46", title: "Permutations", difficulty: "Medium", leetcodeNum: 46}
+                ]
+            },
+            "Day 73 (Dec 2)": {
+                topic: "Combinations & Subsets",
+                problems: [
+                    {id: "lc78", title: "Subsets", difficulty: "Medium", leetcodeNum: 78},
+                    {id: "lc90", title: "Subsets II", difficulty: "Medium", leetcodeNum: 90},
+                    {id: "lc77", title: "Combinations", difficulty: "Medium", leetcodeNum: 77},
+                    {id: "lc39", title: "Combination Sum", difficulty: "Medium", leetcodeNum: 39}
+                ]
+            },
+            "Day 74 (Dec 3)": {
+                topic: "Advanced Combinations",
+                problems: [
+                    {id: "lc40", title: "Combination Sum II", difficulty: "Medium", leetcodeNum: 40},
+                    {id: "lc216", title: "Combination Sum III", difficulty: "Medium", leetcodeNum: 216},
+                    {id: "lc47", title: "Permutations II", difficulty: "Medium", leetcodeNum: 47}
+                ]
+            },
+            "Day 75 (Dec 4)": {
+                topic: "Grid Backtracking",
+                problems: [
+                    {id: "lc79", title: "Word Search", difficulty: "Medium", leetcodeNum: 79},
+                    {id: "lc51", title: "N-Queens", difficulty: "Hard", leetcodeNum: 51},
+                    {id: "lc52", title: "N-Queens II", difficulty: "Hard", leetcodeNum: 52},
+                    {id: "lc37", title: "Sudoku Solver", difficulty: "Hard", leetcodeNum: 37}
+                ]
+            },
+            "Day 76 (Dec 5)": {
+                topic: "String Backtracking",
+                problems: [
+                    {id: "lc131", title: "Palindrome Partitioning", difficulty: "Medium", leetcodeNum: 131},
+                    {id: "lc93", title: "Restore IP Addresses", difficulty: "Medium", leetcodeNum: 93},
+                    {id: "lc784", title: "Letter Case Permutation", difficulty: "Medium", leetcodeNum: 784}
+                ]
+            },
+            "Day 77 (Dec 6)": {
+                topic: "Advanced Backtracking",
+                problems: [
+                    {id: "lc282", title: "Expression Add Operators", difficulty: "Hard", leetcodeNum: 282},
+                    {id: "lc301", title: "Remove Invalid Parentheses", difficulty: "Hard", leetcodeNum: 301},
+                    {id: "lc140", title: "Word Break II", difficulty: "Hard", leetcodeNum: 140}
+                ]
+            },
+            "Day 78 (Dec 7)": {
+                topic: "Week 11 Review",
+                problems: [
+                    {id: "lc526", title: "Beautiful Arrangement", difficulty: "Medium", leetcodeNum: 526},
+                    {id: "lc698", title: "Partition to K Equal Sum Subsets", difficulty: "Medium", leetcodeNum: 698},
+                    {id: "lc1849", title: "Splitting a String Into Descending Consecutive Values", difficulty: "Medium", leetcodeNum: 1849}
+                ]
+            }
+        }
+    },
+    "Week 12": {
+        title: "Advanced Graph Algorithms (Dec 8-14)",
+        days: {
+            "Day 79 (Dec 8)": {
+                topic: "Union Find",
+                problems: [
+                    {id: "lc547", title: "Number of Provinces", difficulty: "Medium", leetcodeNum: 547},
+                    {id: "lc684", title: "Redundant Connection", difficulty: "Medium", leetcodeNum: 684},
+                    {id: "lc721", title: "Accounts Merge", difficulty: "Medium", leetcodeNum: 721}
+                ]
+            },
+            "Day 80 (Dec 9)": {
+                topic: "Shortest Path",
+                problems: [
+                    {id: "lc743", title: "Network Delay Time", difficulty: "Medium", leetcodeNum: 743},
+                    {id: "lc787", title: "Cheapest Flights Within K Stops", difficulty: "Medium", leetcodeNum: 787},
+                    {id: "lc1514", title: "Path with Maximum Probability", difficulty: "Medium", leetcodeNum: 1514},
+                    {id: "lc1334", title: "Find the City", difficulty: "Medium", leetcodeNum: 1334}
+                ]
+            },
+            "Day 81 (Dec 10)": {
+                topic: "MST & Advanced",
+                problems: [
+                    {id: "lc1584", title: "Min Cost to Connect All Points", difficulty: "Medium", leetcodeNum: 1584},
+                    {id: "lc778", title: "Swim in Rising Water", difficulty: "Hard", leetcodeNum: 778},
+                    {id: "lc1192", title: "Critical Connections in a Network", difficulty: "Hard", leetcodeNum: 1192}
+                ]
+            },
+            "Day 82 (Dec 11)": {
+                topic: "Advanced Graph Problems",
+                problems: [
+                    {id: "lc332", title: "Reconstruct Itinerary", difficulty: "Hard", leetcodeNum: 332},
+                    {id: "lc269_v2", title: "Alien Dictionary", difficulty: "Hard", leetcodeNum: 269},
+                    {id: "lc444", title: "Sequence Reconstruction", difficulty: "Medium", leetcodeNum: 444}
+                ]
+            },
+            "Day 83 (Dec 12)": {
+                topic: "Graph + DP",
+                problems: [
+                    {id: "lc329", title: "Longest Increasing Path in Matrix", difficulty: "Hard", leetcodeNum: 329},
+                    {id: "lc741", title: "Cherry Pickup", difficulty: "Hard", leetcodeNum: 741},
+                    {id: "lc1368", title: "Minimum Cost to Make at Least One Valid Path", difficulty: "Hard", leetcodeNum: 1368},
+                    {id: "lc1976", title: "Number of Ways to Arrive at Destination", difficulty: "Medium", leetcodeNum: 1976}
+                ]
+            },
+            "Day 84 (Dec 13)": {
+                topic: "Graph Practice",
+                problems: [
+                    {id: "lc785", title: "Is Graph Bipartite?", difficulty: "Medium", leetcodeNum: 785},
+                    {id: "lc886", title: "Possible Bipartition", difficulty: "Medium", leetcodeNum: 886},
+                    {id: "lc990", title: "Satisfiability of Equality Equations", difficulty: "Medium", leetcodeNum: 990}
+                ]
+            },
+            "Day 85 (Dec 14)": {
+                topic: "Week 12 Review",
+                problems: [
+                    {id: "lc399", title: "Evaluate Division", difficulty: "Medium", leetcodeNum: 399},
+                    {id: "lc947", title: "Most Stones Removed", difficulty: "Medium", leetcodeNum: 947},
+                    {id: "lc839", title: "Similar String Groups", difficulty: "Hard", leetcodeNum: 839}
+                ]
+            }
+        }
+    },
+    "Week 13": {
+        title: "System Design & Hard Problems (Dec 15-21)",
+        days: {
+            "Day 86 (Dec 15)": {
+                topic: "Design Problems",
+                problems: [
+                    {id: "lc146", title: "LRU Cache", difficulty: "Medium", leetcodeNum: 146},
+                    {id: "lc460", title: "LFU Cache", difficulty: "Hard", leetcodeNum: 460},
+                    {id: "lc355", title: "Design Twitter", difficulty: "Medium", leetcodeNum: 355}
+                ]
+            },
+            "Day 87 (Dec 16)": {
+                topic: "Data Structure Design",
+                problems: [
+                    {id: "lc706", title: "Design HashMap", difficulty: "Easy", leetcodeNum: 706},
+                    {id: "lc705", title: "Design HashSet", difficulty: "Easy", leetcodeNum: 705},
+                    {id: "lc380_v2", title: "Insert Delete GetRandom O(1)", difficulty: "Medium", leetcodeNum: 380},
+                    {id: "lc381", title: "Insert Delete GetRandom O(1) - Duplicates", difficulty: "Hard", leetcodeNum: 381}
+                ]
+            },
+            "Day 88 (Dec 17)": {
+                topic: "Advanced Design",
+                problems: [
+                    {id: "lc642", title: "Design Search Autocomplete System", difficulty: "Hard", leetcodeNum: 642},
+                    {id: "lc1166", title: "Design File System", difficulty: "Medium", leetcodeNum: 1166},
+                    {id: "lc588", title: "Design In-Memory File System", difficulty: "Hard", leetcodeNum: 588}
+                ]
+            },
+            "Day 89 (Dec 18)": {
+                topic: "Mathematical Problems",
+                problems: [
+                    {id: "lc50", title: "Pow(x, n)", difficulty: "Medium", leetcodeNum: 50},
+                    {id: "lc29", title: "Divide Two Integers", difficulty: "Medium", leetcodeNum: 29},
+                    {id: "lc43", title: "Multiply Strings", difficulty: "Medium", leetcodeNum: 43},
+                    {id: "lc12", title: "Integer to Roman", difficulty: "Medium", leetcodeNum: 12}
+                ]
+            },
+            "Day 90 (Dec 19)": {
+                topic: "Bit Manipulation",
+                problems: [
+                    {id: "lc137", title: "Single Number II", difficulty: "Medium", leetcodeNum: 137},
+                    {id: "lc260", title: "Single Number III", difficulty: "Medium", leetcodeNum: 260},
+                    {id: "lc421", title: "Maximum XOR of Two Numbers", difficulty: "Medium", leetcodeNum: 421}
+                ]
+            },
+            "Day 91 (Dec 20)": {
+                topic: "Hard Mixed",
+                problems: [
+                    {id: "lc4", title: "Median of Two Sorted Arrays", difficulty: "Hard", leetcodeNum: 4},
+                    {id: "lc23_v2", title: "Merge k Sorted Lists", difficulty: "Hard", leetcodeNum: 23},
+                    {id: "lc25", title: "Reverse Nodes in k-Group", difficulty: "Hard", leetcodeNum: 25},
+                    {id: "lc68", title: "Text Justification", difficulty: "Hard", leetcodeNum: 68}
+                ]
+            },
+            "Day 92 (Dec 21)": {
+                topic: "Week 13 Review",
+                problems: [
+                    {id: "lc65", title: "Valid Number", difficulty: "Hard", leetcodeNum: 65},
+                    {id: "lc224", title: "Basic Calculator", difficulty: "Hard", leetcodeNum: 224},
+                    {id: "lc227", title: "Basic Calculator II", difficulty: "Medium", leetcodeNum: 227}
+                ]
+            }
+        }
+    },
+    "Week 14": {
+        title: "Company Specific & Final Prep (Dec 22-31)",
+        days: {
+            "Day 93 (Dec 22)": {
+                topic: "Google Patterns",
+                problems: [
+                    {id: "lc253", title: "Meeting Rooms II", difficulty: "Medium", leetcodeNum: 253},
+                    {id: "lc57", title: "Insert Interval", difficulty: "Medium", leetcodeNum: 57},
+                    {id: "lc680_v2", title: "Valid Palindrome II", difficulty: "Easy", leetcodeNum: 680}
+                ]
+            },
+            "Day 94 (Dec 23)": {
+                topic: "Amazon Patterns",
+                problems: [
+                    {id: "lc1_v3", title: "Two Sum", difficulty: "Easy", leetcodeNum: 1},
+                    {id: "lc973_v2", title: "K Closest Points to Origin", difficulty: "Medium", leetcodeNum: 973},
+                    {id: "lc692", title: "Top K Frequent Words", difficulty: "Medium", leetcodeNum: 692},
+                    {id: "lc937", title: "Reorder Data in Log Files", difficulty: "Easy", leetcodeNum: 937}
+                ]
+            },
+            "Day 95 (Dec 24)": {
+                topic: "Meta Patterns",
+                problems: [
+                    {id: "lc125_v2", title: "Valid Palindrome", difficulty: "Easy", leetcodeNum: 125},
+                    {id: "lc283_v2", title: "Move Zeroes", difficulty: "Easy", leetcodeNum: 283},
+                    {id: "lc560_v2", title: "Subarray Sum Equals K", difficulty: "Medium", leetcodeNum: 560}
+                ]
+            },
+            "Day 96 (Dec 25)": {
+                topic: "Microsoft Patterns",
+                problems: [
+                    {id: "lc206_v2", title: "Reverse Linked List", difficulty: "Easy", leetcodeNum: 206},
+                    {id: "lc56", title: "Merge Intervals", difficulty: "Medium", leetcodeNum: 56},
+                    {id: "lc15_v2", title: "3Sum", difficulty: "Medium", leetcodeNum: 15},
+                    {id: "lc3_v2", title: "Longest Substring Without Repeating Characters", difficulty: "Medium", leetcodeNum: 3}
+                ]
+            },
+            "Day 97 (Dec 26)": {
+                topic: "Apple Patterns",
+                problems: [
+                    {id: "lc1_v4", title: "Two Sum", difficulty: "Easy", leetcodeNum: 1},
+                    {id: "lc53_v3", title: "Maximum Subarray", difficulty: "Easy", leetcodeNum: 53},
+                    {id: "lc9", title: "Palindrome Number", difficulty: "Easy", leetcodeNum: 9}
+                ]
+            },
+            "Day 98 (Dec 27)": {
+                topic: "Final Hard Problems",
+                problems: [
+                    {id: "lc239_v2", title: "Sliding Window Maximum", difficulty: "Hard", leetcodeNum: 239},
+                    {id: "lc76_v2", title: "Minimum Window Substring", difficulty: "Hard", leetcodeNum: 76},
+                    {id: "lc84", title: "Largest Rectangle in Histogram", difficulty: "Hard", leetcodeNum: 84},
+                    {id: "lc42_v2", title: "Trapping Rain Water", difficulty: "Hard", leetcodeNum: 42}
+                ]
+            },
+            "Day 99 (Dec 28)": {
+                topic: "Mock Interview Practice",
+                problems: [
+                    {id: "mock1", title: "Design Data Structure", difficulty: "Medium", leetcodeNum: "Design"},
+                    {id: "mock2", title: "System Design Basic", difficulty: "Medium", leetcodeNum: "System"},
+                    {id: "mock3", title: "Time Practice - Medium", difficulty: "Medium", leetcodeNum: "Timed"},
+                    {id: "mock4", title: "Explain Solutions", difficulty: "Medium", leetcodeNum: "Explain"}
+                ]
+            },
+            "Day 100 (Dec 29)": {
+                topic: "Comprehensive Review",
+                problems: [
+                    {id: "review1", title: "Hardest Array Problem", difficulty: "Hard", leetcodeNum: "Review"},
+                    {id: "review2", title: "Hardest Tree Problem", difficulty: "Hard", leetcodeNum: "Review"},
+                    {id: "review3", title: "Pattern Recognition", difficulty: "Medium", leetcodeNum: "Pattern"},
+                    {id: "review4", title: "Weak Area Focus", difficulty: "Hard", leetcodeNum: "Focus"}
+                ]
+            },
+            "Day 101 (Dec 30)": {
+                topic: "Final Assessment",
+                problems: [
+                    {id: "final1", title: "3 Medium in 90min", difficulty: "Medium", leetcodeNum: "Final1"},
+                    {id: "final2", title: "1 Hard in 45min", difficulty: "Hard", leetcodeNum: "Final2"},
+                    {id: "final3", title: "Mock Interview", difficulty: "Mixed", leetcodeNum: "Mock"},
+                    {id: "final4", title: "Progress Evaluation", difficulty: "Assessment", leetcodeNum: "Eval"}
+                ]
+            },
+            "Day 102 (Dec 31)": {
+                topic: "New Year Prep",
+                problems: [
+                    {id: "lc121_v2", title: "Best Time to Buy and Sell Stock", difficulty: "Easy", leetcodeNum: 121},
+                    {id: "lc70_v2", title: "Climbing Stairs", difficulty: "Easy", leetcodeNum: 70},
+                    {id: "lc1_v5", title: "Two Sum", difficulty: "Easy", leetcodeNum: 1},
+                    {id: "plan2026", title: "Plan January 2026", difficulty: "Planning", leetcodeNum: "2026"}
+                ]
+            }
+        }
+    }
+};
+        // State management
+        let userProgress = JSON.parse(localStorage.getItem('dsaProgress')) || {};
+        let userNotes = JSON.parse(localStorage.getItem('dsaNotes')) || {};
+        let currentStreak = parseInt(localStorage.getItem('currentStreak')) || 0;
+        let weekendBucket = JSON.parse(localStorage.getItem('weekendBucket')) || [];
+
+        // Initialize the app
+        function init() {
+            loadProblems();
+            updateStats();
+            setupEventListeners();
+            generateStreakDots();
+            loadWeekendBucket();
+        }
+
+        function loadProblems() {
+            const container = document.getElementById('problemsContainer');
+            const weekFilter = document.getElementById('weekFilter');
+            
+            Object.keys(problemData).forEach(weekKey => {
+                // Add to week filter
+                const option = document.createElement('option');
+                option.value = weekKey;
+                option.textContent = weekKey;
+                weekFilter.appendChild(option);
+
+                const week = problemData[weekKey];
+                const weekDiv = createWeekSection(weekKey, week);
+                container.appendChild(weekDiv);
+            });
+        }
+
+        function createWeekSection(weekKey, week) {
+            const weekDiv = document.createElement('div');
+            weekDiv.className = 'week-section';
+            weekDiv.dataset.week = weekKey;
+
+            const completedProblems = getWeekCompletedCount(week);
+            const totalProblems = getWeekTotalCount(week);
+
+            weekDiv.innerHTML = `
+                <div class="week-header" onclick="toggleWeek('${weekKey}')">
+                    <span>${weekKey}: ${week.title}</span>
+                    <span class="week-progress">${completedProblems}/${totalProblems} completed</span>
+                </div>
+                <div class="collapsible" id="week-${weekKey}">
+                    ${Object.keys(week.days).map(dayKey => createDaySection(dayKey, week.days[dayKey])).join('')}
+                </div>
+            `;
+
+            return weekDiv;
+        }
+
+        function createDaySection(dayKey, day) {
+            const completedProblems = day.problems.filter(p => userProgress[p.id]?.completed).length;
+            
+            return `
+                <div class="day-container">
+                    <div class="day-header">
+                        <span>${dayKey} - ${day.topic}</span>
+                        <span class="day-progress">${completedProblems}/${day.problems.length} completed</span>
+                    </div>
+                    <div class="problems-list">
+                        ${day.problems.map(problem => createProblemItem(problem)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function createProblemItem(problem) {
+            const progress = userProgress[problem.id] || {};
+            const hasNotes = userNotes[problem.id] && userNotes[problem.id].trim();
+            
+            return `
+                <div class="problem-item" data-difficulty="${problem.difficulty}" data-status="${progress.completed ? 'completed' : 'pending'}">
+                    <input type="checkbox" class="problem-checkbox" ${progress.completed ? 'checked' : ''} 
+                           onchange="toggleProblem('${problem.id}')">
+                    <div class="problem-info">
+                        <div class="problem-title">${problem.title}</div>
+                        <div class="problem-meta">
+                            <span class="difficulty-${problem.difficulty.toLowerCase()}">${problem.difficulty}</span>
+                            <a href="https://leetcode.com/problems/${problem.title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')}" 
+                               target="_blank" class="problem-link">LC ${problem.leetcodeNum}</a>
+                        </div>
+                    </div>
+                    <div class="problem-actions">
+                        <button class="action-btn revision-btn ${progress.needsRevision ? 'active' : ''}" 
+                                onclick="toggleRevision('${problem.id}')" title="Mark for revision">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <button class="action-btn notes-btn ${hasNotes ? 'active' : ''}" 
+                                onclick="openNotesModal('${problem.id}', '${problem.title}')" title="Add notes">
+                            <i class="fas fa-sticky-note"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleWeek(weekKey) {
+            const content = document.getElementById(`week-${weekKey}`);
+            content.classList.toggle('show');
+        }
+
+        function toggleProblem(problemId) {
+            if (!userProgress[problemId]) {
+                userProgress[problemId] = {};
+            }
+            
+            userProgress[problemId].completed = !userProgress[problemId].completed;
+            userProgress[problemId].completedDate = userProgress[problemId].completed ? new Date().toISOString() : null;
+            
+            // Remove from weekend bucket if completed
+            if (userProgress[problemId].completed) {
+                weekendBucket = weekendBucket.filter(id => id !== problemId);
+                localStorage.setItem('weekendBucket', JSON.stringify(weekendBucket));
+            }
+            
+            saveProgress();
+            updateStats();
+            applyFilters();
+            loadWeekendBucket();
+            updateStreakIfNeeded();
+        }
+
+        function toggleRevision(problemId) {
+            if (!userProgress[problemId]) {
+                userProgress[problemId] = {};
+            }
+            
+            userProgress[problemId].needsRevision = !userProgress[problemId].needsRevision;
+            
+            // Add to weekend bucket if marked for revision and not completed
+            if (userProgress[problemId].needsRevision && !userProgress[problemId].completed) {
+                if (!weekendBucket.includes(problemId)) {
+                    weekendBucket.push(problemId);
+                    localStorage.setItem('weekendBucket', JSON.stringify(weekendBucket));
+                }
+            }
+            
+            saveProgress();
+            applyFilters();
+            loadWeekendBucket();
+        }
+
+        function openNotesModal(problemId, problemTitle) {
+            document.getElementById('notesModal').style.display = 'block';
+            document.getElementById('notesTitle').textContent = `Notes: ${problemTitle}`;
+            document.getElementById('notesText').value = userNotes[problemId] || '';
+            document.getElementById('notesModal').dataset.problemId = problemId;
+        }
+
+        function closeNotesModal() {
+            document.getElementById('notesModal').style.display = 'none';
+        }
+
+        function saveNotes() {
+            const problemId = document.getElementById('notesModal').dataset.problemId;
+            const notes = document.getElementById('notesText').value;
+            
+            userNotes[problemId] = notes;
+            localStorage.setItem('dsaNotes', JSON.stringify(userNotes));
+            
+            closeNotesModal();
+            applyFilters(); // Refresh to show notes indicator
+        }
+
+        function setupEventListeners() {
+            document.getElementById('difficultyFilter').addEventListener('change', applyFilters);
+            document.getElementById('statusFilter').addEventListener('change', applyFilters);
+            document.getElementById('weekFilter').addEventListener('change', applyFilters);
+            document.getElementById('searchBox').addEventListener('input', applyFilters);
+            
+            // Close modal when clicking outside
+            document.getElementById('notesModal').addEventListener('click', (e) => {
+                if (e.target.id === 'notesModal') {
+                    closeNotesModal();
+                }
+            });
+        }
+
+        function applyFilters() {
+            const difficulty = document.getElementById('difficultyFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const week = document.getElementById('weekFilter').value;
+            const search = document.getElementById('searchBox').value.toLowerCase();
+
+            document.querySelectorAll('.week-section').forEach(weekSection => {
+                const weekKey = weekSection.dataset.week;
+                let weekVisible = !week || weekKey === week;
+                
+                if (!weekVisible) {
+                    weekSection.style.display = 'none';
+                    return;
+                }
+
+                weekSection.style.display = 'block';
+                let hasVisibleProblems = false;
+
+                weekSection.querySelectorAll('.problem-item').forEach(item => {
+                    const itemDifficulty = item.dataset.difficulty;
+                    const itemStatus = item.dataset.status;
+                    const title = item.querySelector('.problem-title').textContent.toLowerCase();
+                    
+                    const matchesDifficulty = !difficulty || itemDifficulty === difficulty;
+                    const matchesStatus = !status || itemStatus === status || 
+                                        (status === 'revision' && userProgress[item.querySelector('.problem-checkbox').onchange.toString().match(/'([^']+)'/)[1]]?.needsRevision);
+                    const matchesSearch = !search || title.includes(search);
+                    
+                    const visible = matchesDifficulty && matchesStatus && matchesSearch;
+                    item.style.display = visible ? 'flex' : 'none';
+                    
+                    if (visible) hasVisibleProblems = true;
+                });
+
+                // Hide day containers with no visible problems
+                weekSection.querySelectorAll('.day-container').forEach(dayContainer => {
+                    const visibleProblems = dayContainer.querySelectorAll('.problem-item[style="display: flex;"], .problem-item:not([style])');
+                    dayContainer.style.display = visibleProblems.length > 0 ? 'block' : 'none';
+                });
+
+                weekSection.style.display = hasVisibleProblems ? 'block' : 'none';
+            });
+        }
+
+        function updateStats() {
+            const totalProblems = getAllProblems().length;
+            const solvedProblems = Object.values(userProgress).filter(p => p.completed).length;
+            const completionRate = totalProblems > 0 ? Math.round((solvedProblems / totalProblems) * 100) : 0;
+
+            document.getElementById('totalSolved').textContent = `${solvedProblems}/${totalProblems}`;
+            document.getElementById('currentStreak').textContent = currentStreak;
+            document.getElementById('weekendBucket').textContent = weekendBucket.length;
+            document.getElementById('completionRate').textContent = `${completionRate}%`;
+
+            // Update week progress
+            Object.keys(problemData).forEach(weekKey => {
+                const week = problemData[weekKey];
+                const completedCount = getWeekCompletedCount(week);
+                const totalCount = getWeekTotalCount(week);
+                
+                const weekHeader = document.querySelector(`[onclick="toggleWeek('${weekKey}')"] .week-progress`);
+                if (weekHeader) {
+                    weekHeader.textContent = `${completedCount}/${totalCount} completed`;
+                }
+            });
+
+            // Update day progress
+            Object.keys(problemData).forEach(weekKey => {
+                const week = problemData[weekKey];
+                Object.keys(week.days).forEach(dayKey => {
+                    const day = week.days[dayKey];
+                    const completedCount = day.problems.filter(p => userProgress[p.id]?.completed).length;
+                    
+                    const dayProgress = document.querySelector(`[data-week="${weekKey}"] .day-container .day-progress`);
+                    if (dayProgress) {
+                        dayProgress.textContent = `${completedCount}/${day.problems.length} completed`;
+                    }
+                });
+            });
+        }
+
+        function generateStreakDots() {
+            const container = document.getElementById('streakDots');
+            container.innerHTML = '';
+            
+            const today = new Date();
+            const startDate = new Date('2025-09-19'); // Start date from the plan
+            
+            for (let i = 0; i < 30; i++) { // Show last 30 days
+                const date = new Date(today);
+                date.setDate(date.getDate() - (29 - i));
+                
+                const dot = document.createElement('div');
+                dot.className = 'streak-dot';
+                
+                if (date.toDateString() === today.toDateString()) {
+                    dot.classList.add('current');
+                } else if (hasCompletedProblemsOnDate(date)) {
+                    dot.classList.add('completed');
+                } else if (date < today) {
+                    dot.classList.add('missed');
+                }
+                
+                dot.title = date.toDateString();
+                container.appendChild(dot);
+            }
+        }
+
+        function hasCompletedProblemsOnDate(date) {
+            const dateStr = date.toDateString();
+            return Object.values(userProgress).some(progress => {
+                if (!progress.completedDate) return false;
+                const completedDate = new Date(progress.completedDate);
+                return completedDate.toDateString() === dateStr;
+            });
+        }
+
+        function updateStreakIfNeeded() {
+            const today = new Date().toDateString();
+            const hasCompletedToday = Object.values(userProgress).some(progress => {
+                if (!progress.completedDate) return false;
+                const completedDate = new Date(progress.completedDate);
+                return completedDate.toDateString() === today;
+            });
+
+            if (hasCompletedToday) {
+                const lastCompletionDate = localStorage.getItem('lastCompletionDate');
+                if (lastCompletionDate !== today) {
+                    currentStreak++;
+                    localStorage.setItem('currentStreak', currentStreak);
+                    localStorage.setItem('lastCompletionDate', today);
+                    generateStreakDots();
+                }
+            }
+        }
+
+        function loadWeekendBucket() {
+            const container = document.getElementById('weekendProblems');
+            
+            if (weekendBucket.length === 0) {
+                container.innerHTML = '<p>No missed problems yet! Keep up the great work! 🎉</p>';
+                return;
+            }
+
+            const problems = weekendBucket.map(problemId => {
+                const problem = findProblemById(problemId);
+                if (!problem) return null;
+                
+                return `
+                    <div class="problem-item" style="margin-bottom: 10px;">
+                        <input type="checkbox" class="problem-checkbox" onchange="toggleProblem('${problem.id}')">
+                        <div class="problem-info">
+                            <div class="problem-title">${problem.title}</div>
+                            <div class="problem-meta">
+                                <span class="difficulty-${problem.difficulty.toLowerCase()}">${problem.difficulty}</span>
+                                <a href="https://leetcode.com/problems/${problem.title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')}" 
+                                   target="_blank" class="problem-link">LC ${problem.leetcodeNum}</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).filter(Boolean).join('');
+
+            container.innerHTML = problems || '<p>Weekend bucket is empty! 🎉</p>';
+        }
+
+        function getAllProblems() {
+            const problems = [];
+            Object.values(problemData).forEach(week => {
+                Object.values(week.days).forEach(day => {
+                    problems.push(...day.problems);
+                });
+            });
+            return problems;
+        }
+
+        function findProblemById(problemId) {
+            const allProblems = getAllProblems();
+            return allProblems.find(p => p.id === problemId);
+        }
+
+        function getWeekCompletedCount(week) {
+            let count = 0;
+            Object.values(week.days).forEach(day => {
+                day.problems.forEach(problem => {
+                    if (userProgress[problem.id]?.completed) count++;
+                });
+            });
+            return count;
+        }
+
+        function getWeekTotalCount(week) {
+            let count = 0;
+            Object.values(week.days).forEach(day => {
+                count += day.problems.length;
+            });
+            return count;
+        }
+
+        function saveProgress() {
+            localStorage.setItem('dsaProgress', JSON.stringify(userProgress));
+        }
+
+        // Auto-save feature
+        setInterval(() => {
+            saveProgress();
+        }, 30000); // Save every 30 seconds
+
+        // Add missed problems to weekend bucket automatically
+        function checkMissedProblems() {
+            const today = new Date();
+            const todayStr = today.toDateString();
+            
+            // Get today's problems based on the schedule
+            const expectedProblems = getProblemsForDate(today);
+            
+            expectedProblems.forEach(problemId => {
+                const progress = userProgress[problemId];
+                if (!progress || !progress.completed) {
+                    // Check if it's past the expected completion date
+                    const expectedDate = getExpectedDateForProblem(problemId);
+                    if (expectedDate && expectedDate < today && !weekendBucket.includes(problemId)) {
+                        weekendBucket.push(problemId);
+                    }
+                }
+            });
+            
+            localStorage.setItem('weekendBucket', JSON.stringify(weekendBucket));
+        }
+
+        function getProblemsForDate(date) {
+            // This would need to be implemented based on the schedule
+            // For now, return empty array
+            return [];
+        }
+
+        function getExpectedDateForProblem(problemId) {
+            // This would need to be implemented based on the schedule
+            // For now, return null
+            return null;
+        }
+
+        // Enhanced problem data with more weeks
+        const extendedProblemData = {
+            ...problemData,
+            "Week 3": {
+                title: "Trees Introduction (Oct 3-9)",
+                days: {
+                    "Day 15 (Oct 3)": {
+                        topic: "Binary Tree Basics",
+                        problems: [
+                            {id: "lc104", title: "Maximum Depth of Binary Tree", difficulty: "Easy", leetcodeNum: 104},
+                            {id: "lc226", title: "Invert Binary Tree", difficulty: "Easy", leetcodeNum: 226},
+                            {id: "lc100", title: "Same Tree", difficulty: "Easy", leetcodeNum: 100}
+                        ]
+                    },
+                    "Day 16 (Oct 4)": {
+                        topic: "Tree Traversals",
+                        problems: [
+                            {id: "lc94", title: "Binary Tree Inorder Traversal", difficulty: "Easy", leetcodeNum: 94},
+                            {id: "lc144", title: "Binary Tree Preorder Traversal", difficulty: "Easy", leetcodeNum: 144},
+                            {id: "lc145", title: "Binary Tree Postorder Traversal", difficulty: "Easy", leetcodeNum: 145},
+                            {id: "lc112", title: "Path Sum", difficulty: "Easy", leetcodeNum: 112}
+                        ]
+                    },
+                    "Day 17 (Oct 5)": {
+                        topic: "Tree Properties",
+                        problems: [
+                            {id: "lc101", title: "Symmetric Tree", difficulty: "Easy", leetcodeNum: 101},
+                            {id: "lc543", title: "Diameter of Binary Tree", difficulty: "Easy", leetcodeNum: 543},
+                            {id: "lc110", title: "Balanced Binary Tree", difficulty: "Easy", leetcodeNum: 110}
+                        ]
+                    }
+                }
+            },
+            "Week 4": {
+                title: "Sorting & Searching (Oct 10-16)",
+                days: {
+                    "Day 22 (Oct 10)": {
+                        topic: "Sorting Basics",
+                        problems: [
+                            {id: "lc75", title: "Sort Colors", difficulty: "Medium", leetcodeNum: 75},
+                            {id: "lc905", title: "Sort Array By Parity", difficulty: "Easy", leetcodeNum: 905},
+                            {id: "lc922", title: "Sort Array By Parity II", difficulty: "Easy", leetcodeNum: 922}
+                        ]
+                    },
+                    "Day 23 (Oct 11)": {
+                        topic: "Sorting Applications",
+                        problems: [
+                            {id: "lc252", title: "Meeting Rooms", difficulty: "Easy", leetcodeNum: 252},
+                            {id: "lc179", title: "Largest Number", difficulty: "Medium", leetcodeNum: 179},
+                            {id: "lc1122", title: "Relative Sort Array", difficulty: "Easy", leetcodeNum: 1122},
+                            {id: "lc1051", title: "Height Checker", difficulty: "Easy", leetcodeNum: 1051}
+                        ]
+                    }
+                }
+            }
+        };
+
+        // Update problemData with extended data
+        Object.assign(problemData, extendedProblemData);
+
+        // Export/Import functionality
+        function exportProgress() {
+            const data = {
+                progress: userProgress,
+                notes: userNotes,
+                streak: currentStreak,
+                weekendBucket: weekendBucket,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `dsa-progress-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importProgress(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (confirm('This will overwrite your current progress. Continue?')) {
+                        userProgress = data.progress || {};
+                        userNotes = data.notes || {};
+                        currentStreak = data.streak || 0;
+                        weekendBucket = data.weekendBucket || [];
+                        
+                        saveProgress();
+                        localStorage.setItem('dsaNotes', JSON.stringify(userNotes));
+                        localStorage.setItem('currentStreak', currentStreak);
+                        localStorage.setItem('weekendBucket', JSON.stringify(weekendBucket));
+                        
+                        location.reload();
+                    }
+                } catch (error) {
+                    alert('Invalid file format');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Add export/import buttons to header
+        function addExportImportButtons() {
+            const header = document.querySelector('.header');
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.innerHTML = `
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="exportProgress()" style="margin-right: 10px; padding: 8px 16px; background: #48bb78; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        <i class="fas fa-download"></i> Export Progress
+                    </button>
+                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importProgress(event)">
+                    <button onclick="document.getElementById('importFile').click()" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                        <i class="fas fa-upload"></i> Import Progress
+                    </button>
+                </div>
+            `;
+            header.appendChild(buttonsDiv);
+        }
+
+        // Initialize the app when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            addExportImportButtons();
+            
+            // Check for missed problems daily
+            checkMissedProblems();
+            
+            // Set up daily check
+            setInterval(checkMissedProblems, 24 * 60 * 60 * 1000); // Check once per day
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'f':
+                        e.preventDefault();
+                        document.getElementById('searchBox').focus();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        exportProgress();
+                        break;
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                closeNotesModal();
+            }
+        });
+
+        // Add motivational quotes
+        const motivationalQuotes = [
+            "Every expert was once a beginner. Every pro was once an amateur.",
+            "The difference between ordinary and extraordinary is practice.",
+            "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+            "Your MAANG journey starts with a single problem solved.",
+            "Consistency beats intensity. Keep going!",
+            "The best time to plant a tree was 20 years ago. The second best time is now."
+        ];
+
+        function showRandomQuote() {
+            const quote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+            console.log(`🚀 ${quote}`);
+        }
+
+        // Show quote on load
+        showRandomQuote();
+    </script>
+</body>
+</html>
